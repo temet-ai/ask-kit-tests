@@ -1,0 +1,60 @@
+id = "temet.tests"
+name = "tests"
+version = "0.1.0"
+min_ask_kit = "0.3.0"
+says = "this project's checks, run for you: do the tests pass, does it build, lint and typecheck, which tests fail and why (test name, file, line, message, expected and received), each type error with file, line, TS code and message, is a failure new since the last run, is a test flaky over repeated local runs, what did the last run say, which test, lint, build and typecheck scripts the project has and what each runs, which package manager and Node version a JavaScript package expects; and acting on it (fix a failing test or a type error, run a command the project does not define as a check); for npm, pnpm, yarn, bun, pytest, go, make and just projects, and cargo in a mixed project"
+keywords = ["tests?", "test suite", "failing tests?", "unit tests?", "(pass|fail)(ing|ed)? tests?", "tests? (pass|fail)\\w*", "pytest", "jest", "vitest", "mocha", "node --test", "go test", "npm (test|run)", "pnpm (test|run)", "yarn (test|run)", "lint(er|ing)?", "eslint", "ruff", "type ?check", "type-check", "typecheck", "tsc", "mypy", "pyright", "type errors?", "does it (build|compile)", "build (fails?|passes|errors?)", "does the build pass", "package\\.json scripts?", "scripts? (does|do) (it|this|the package) have", "node version", "flaky", "red", "green"]
+route_hint = "running this project's tests, build, lint or typecheck and saying what failed, a test that is flaky over repeated local runs, the project's package.json scripts and its package manager and Node version, and fixing a failing test or type error, are tests; a question that names cargo, clippy, rustc, crates or a Rust workspace is rust; which packages are installed, why, outdated or vulnerable, and adding or removing one, is deps; whether a test is flaky across CI history, and what checks cost and catch across CI and hooks, is checks; why CI failed on GitHub is github; reading or changing the test code without running it is code; what a past session ran is sessions"
+cite = "the check and its command, the test name with `path:line`, and the run id"
+instructions = "instructions.md"
+state_key = "${WORKDIR}"
+acts = ["checks.exec", "repo.edit", "repo.write"]
+
+[[settings]]
+key = "WORKDIR"
+about = "the folder whose project is checked; by default the folder the agent runs in"
+detect = ["node", "-e", "process.stdout.write(process.cwd())"]
+
+[[settings]]
+key = "PROJECT_ROOT"
+about = "the project's top folder, which the `repo` source reads; found as the nearest folder at or above the agent's folder with a project manifest (package.json, Cargo.toml, go.mod, pyproject.toml, a Makefile or a justfile)"
+detect = ["node", "-e", "const fs=require('fs'),p=require('path');const m=['package.json','Cargo.toml','go.mod','pyproject.toml','pytest.ini','setup.py','Makefile','makefile','justfile','Justfile','deno.json'];let d=process.cwd();for(;;){if(m.some(f=>fs.existsSync(p.join(d,f)))){process.stdout.write(d);break}const u=p.dirname(d);if(u===d){process.stdout.write(process.cwd());break}d=u}"]
+
+[[sources]]
+kind = "module"
+name = "checks"
+module = "checks.mjs"
+api = "api.d.ts"
+
+[[sources]]
+kind = "folder"
+name = "repo"
+path = "${PROJECT_ROOT}"
+about = "the project's source and tests: search and read them to say why a test fails, and edit them only when the caller asked for a fix"
+# What the investigator reads goes to a model: credentials, lockfiles, dependencies and build output are never searched or read.
+exclude = [
+  ".env", ".env.*", "*.env", ".npmrc", ".yarnrc", ".yarnrc.yml", ".pnpmrc", ".netrc", ".pypirc", "*.pem", "*.key", "*.p12", "*token*", "*secret*", "*credential*", "id_rsa*", "id_ed25519*", "auth.json", "*cookie*",
+  "node_modules/**", "**/node_modules/**", ".yarn/**", ".pnpm-store/**", ".venv/**", "venv/**", "**/__pycache__/**", "target/**", "**/target/**", ".git/**",
+  "package-lock.json", "npm-shrinkwrap.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "uv.lock", "poetry.lock", "Cargo.lock",
+  "dist/**", "build/**", "out/**", "coverage/**", ".next/**", ".nuxt/**", ".svelte-kit/**", ".turbo/**", ".cache/**", ".vite/**", "playwright-report/**", "test-results/**", "storybook-static/**", "*.tsbuildinfo", "*.min.js", "*.map",
+]
+
+[[roles]]
+name = "tester"
+when = "a request to run the tests, find out why one fails, make them pass, or fix a type error or lint failure"
+patterns = ["^(please )?(run|fix|make)\\b.*\\b(tests?|typecheck|types?|lint|build)\\b", "\\b(tests?|specs?)\\b.*\\b(fail|pass|broken|red|green)\\w*", "\\b(type ?check|tsc|eslint)\\b"]
+instructions = "roles/tester.md"
+
+[[actions]]
+name = "commands"
+title = "The checks this project defines"
+script = "commands"
+match = ['(?:what|which) (?:are|is) the (?:test|lint|build|typecheck|check)(?:s|ing)? commands?(?: (?:here|for this (?:project|repo(?:sitory)?)|in this (?:project|repo(?:sitory)?)))?', 'how do (?:i|you|we) run the (?:tests?|linter|lint|build|typecheck|checks)(?: (?:here|for this (?:project|repo(?:sitory)?)|in this (?:project|repo(?:sitory)?)))?']
+expect = '"checks"'
+
+[[actions]]
+name = "last"
+title = "What the last run of the checks said, without running them"
+script = "last"
+match = ['what (?:did|was) the last (?:test|lint|build|typecheck|check)s? (?:run )?(?:say|said|fail(?:ed)?|result)(?: on)?', 'what failed (?:in|on) the last (?:test )?run']
+expect = '"runs"'

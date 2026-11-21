@@ -1,0 +1,15 @@
+{
+  "name": "watch-roster",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "description": "A fixture for the tests kit's bench: two of its five tests fail on purpose.",
+  "scripts": {
+    "test": "node --test roster.test.mjs",
+    "test:clacks": "node --test clacks.test.mjs",
+    "lint": "node lint.mjs",
+    "build": "node -e \"console.log('built the roster')\"",
+    "dev": "node -e \"setInterval(() => {}, 1000)\"",
+    "deploy": "node -e \"console.log('deployed')\""
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "about": "Shots (`do`) run with no model against the fixtures in bench/fixture: `watch` (node:test tests that fail on purpose, a stand-in linter, scripts that must not run) and `typecheck` (a TypeScript package with five type errors, one in a folder whose name has a space). The `q` questions are kinds agents answer by hand with npm, pnpm, tsc and test runners: did the tests pass and which failed, is the typecheck clean, what do the package's scripts run and which Node version it expects. They are put to these fixtures; paths in them are relative to the kit's folder. Expectations were checked against the scripts' output on 2026-11-21.",
+  "questions": [
+    {
+      "id": "commands",
+      "do": "commands",
+      "params": {
+        "dir": "bench/fixture/watch"
+      },
+      "expect": [
+        "\"name\": \"test\"",
+        "npm run test:clacks",
+        "\"name\": \"lint\"",
+        "it does not end",
+        "it changes things"
+      ]
+    },
+    {
+      "id": "run-test",
+      "do": "run",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "test"
+      },
+      "expect": [
+        "test failed: 2 of 5 tests",
+        "Cable Street has two officers",
+        "roster\\.test\\.mjs",
+        "\"line\": 10",
+        "Nobby is missing from Cable Street"
+      ]
+    },
+    {
+      "id": "run-lint",
+      "do": "run",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "lint"
+      },
+      "expect": [
+        "lint failed: 2 errors",
+        "roster\\.mjs",
+        "throw a WatchError"
+      ]
+    },
+    {
+      "id": "run-build",
+      "do": "run",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "build"
+      },
+      "expect": [
+        "build passed",
+        "\"ok\": true"
+      ]
+    },
+    {
+      "id": "all",
+      "do": "all",
+      "params": {
+        "dir": "bench/fixture/watch"
+      },
+      "expect": [
+        "2 of 3 checks failed",
+        "lint \\(2 failures\\)",
+        "test \\(2 failures\\)"
+      ]
+    },
+    {
+      "id": "last",
+      "do": "last",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "test"
+      },
+      "expect": [
+        "test failed \\(2\\)",
+        "Cable Street has two officers"
+      ]
+    },
+    {
+      "id": "failure",
+      "do": "failure",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "find": "Nobby is on the roster"
+      },
+      "expect": [
+        "TypeError",
+        "Nobby is missing from Cable Street",
+        "roster\\.test\\.mjs:22"
+      ]
+    },
+    {
+      "id": "flaky",
+      "do": "flaky",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "test:clacks",
+        "times": 2
+      },
+      "expect": [
+        "flaky: 1 failed in some of 2 runs",
+        "the clacks message arrives 1/2"
+      ]
+    },
+    {
+      "id": "run-test-expected",
+      "do": "run",
+      "params": {
+        "dir": "bench/fixture/watch",
+        "check": "test"
+      },
+      "expect": [
+        "\"expected\": \"2\"",
+        "\"received\": \"1\"",
+        "\"operator\": \"strictEqual\""
+      ]
+    },
+    {
+      "id": "typecheck",
+      "do": "run",
+      "params": {
+        "dir": "bench/fixture/typecheck",
+        "check": "typecheck"
+      },
+      "expect": [
+        "typecheck failed: 5 errors in 3 files",
+        "\"code\": \"TS2307\"",
+        "src/night watch/beat\\.ts",
+        "\"col\": 80",
+        "Types of parameters 'post' and 'post' are incompatible",
+        "\"src/officer\\.ts\": 2"
+      ]
+    },
+    {
+      "id": "scripts-node",
+      "do": "commands",
+      "params": {
+        "dir": "bench/fixture/watch"
+      },
+      "expect": [
+        "\"manager\": \"npm\"",
+        "node --test roster\\.test\\.mjs",
+        ">=22\\.13"
+      ]
+    },
+    {
+      "id": "failing-tests-q",
+      "q": "Do the tests in bench/fixture/watch pass? For each failure give the test, file:line and what was expected against what was received.",
+      "expect": [
+        "Cable Street has two officers",
+        "roster\\.test\\.mjs[\\s\\S]{0,20}\\b10\\b",
+        "Nobby is missing from Cable Street",
+        "roster\\.test\\.mjs[\\s\\S]{0,20}\\b22\\b"
+      ],
+      "any": [
+        "expected[^.\\n]{0,30}\\b2\\b",
+        "\\b2\\b[^.\\n]{0,30}expected"
+      ]
+    },
+    {
+      "id": "type-errors-q",
+      "q": "Does the package in bench/fixture/typecheck type-check? List each error with file:line and TS code.",
+      "expect": [
+        "officer\\.ts[\\s\\S]{0,150}\\b2\\b",
+        "TS2322",
+        "TS2307",
+        "night watch/beat\\.ts",
+        "duty\\.ts"
+      ]
+    },
+    {
+      "id": "scripts-q",
+      "q": "In bench/fixture/watch, what does `npm test` run, and which Node version does the package expect?",
+      "expect": [
+        "roster\\.test\\.mjs",
+        "22\\.13"
+      ]
+    }
+  ]
+}

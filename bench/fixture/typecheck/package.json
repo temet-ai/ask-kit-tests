@@ -1,0 +1,9 @@
+{
+  "name": "watch-typecheck",
+  "private": true,
+  "type": "module",
+  "description": "A fixture for the tests kit's bench: a TypeScript package with five type errors on purpose, one of them in a folder whose name has a space.",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}
