@@ -336,8 +336,8 @@ function bind(from, workdir, { push, act }) {
     const text = readText(r.logFile) ?? "";
     const parsed = parse(text);
     const lines = clean(text).split("\n");
-    const head = await git(root, "rev-parse", "--short", "HEAD");
-    const dirty = head ? ((await git(root, "status", "--porcelain")) ?? "").split("\n").filter(Boolean).length : null;
+    const [head, status] = await Promise.all([git(root, "rev-parse", "--short", "HEAD"), git(root, "status", "--porcelain")]);
+    const dirty = head ? (status ?? "").split("\n").filter(Boolean).length : null;
     const ok = r.code === 0 && !r.timedOut;
     const rec = {
       id: r.id,
